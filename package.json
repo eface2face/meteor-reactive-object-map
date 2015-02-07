@@ -1,0 +1,23 @@
+{
+  "name": "meteor-reactive-object-map",
+  "version": "1.0.0",
+  "description": "Reactive map helper for meteor blaze templates",
+  "main": "reactive-object-map.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:eface2face/meteor-reactive-object-map.git"
+  },
+  "author": "Sergio Garcia Murillo",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eface2face/meteor-reactive-object-map/issues"
+  },
+  "homepage": "https://github.com/eface2face/meteor-reactive-object-map",
+  "dependencies": {
+    "meteor-core": "^1.2.5",
+    "meteor-tracker": "^1.2.5"
+  }
+}
