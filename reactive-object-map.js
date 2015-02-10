@@ -6,7 +6,7 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap = function() {
 		if (!(this instanceof ReactiveObjectMap))
 		// called without `new`
-			return new ReactiveObjectMap(collection, iteratee);
+			return new ReactiveObjectMap();
 
 		this.map = {};
 		this.dep = new Tracker.Dependency;
@@ -20,21 +20,19 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap.prototype.get = function(key) {
 		if (Tracker.active)
 			this.dep.depend();
-
 		return this.map[key];
 	};
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
 		var old = this.map[key];
 		this.map[key] = value;
-		if (old === value)
+		if (old !== value)
 			this.dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.has = function(key) {
 		if (Tracker.active)
 			this.dep.depend();
-
 		return this.hasOwnProperty(key);
 	};
 
@@ -52,13 +50,14 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap.prototype.setAttribute = function(key, attr, value) {
 		var old = this.map[key][attr];
 		this.map[key][attr] = value;
-		if (old === value)
+		if (old !== value)
 			this.dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.getAttribute = function(key, attr) {
-		this.map[key][attr] = value;
-		this.dep.changed();
+		if (Tracker.active)
+			this.dep.depend();
+		return this.map[key][attr];
 	};
 
 	ReactiveObjectMap.prototype.keys = function() {
