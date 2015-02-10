@@ -1,6 +1,6 @@
 {
   "name": "meteor-reactive-object-map",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Reactive map helper for meteor blaze templates",
   "main": "reactive-object-map.js",
   "scripts": {
