@@ -84,6 +84,12 @@ module.exports = function(Meteor) {
 		return _.sortBy(this.map,iteratee);
 	};
 
+	ReactiveObjectMap.prototype.map = function(iteratee) {
+		if (Tracker.active)
+			this.dep.depend();
+		return _.map(this.map,iteratee);
+	};
+
 	ReactiveObjectMap.prototype.size = function() {
 		if (Tracker.active)
 			this.dep.depend();
