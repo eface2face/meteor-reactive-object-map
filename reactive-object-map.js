@@ -8,92 +8,92 @@ module.exports = function(Meteor) {
 		// called without `new`
 			return new ReactiveObjectMap();
 
-		this.map = {};
-		this.dep = new Tracker.Dependency;
+		this._map = {};
+		this._dep = new Tracker.Dependency;
 	};
 
 	ReactiveObjectMap.prototype.assign = function(collection, iteratee) {
-		this.map = _.indexBy(collection, iteratee);
-		this.dep.changed();
+		this._map = _.indexBy(collection, iteratee);
+		this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.get = function(key) {
 		if (Tracker.active)
-			this.dep.depend();
-		return this.map[key];
+			this._dep.depend();
+		return this._map[key];
 	};
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
-		var old = this.map[key];
-		this.map[key] = value;
+		var old = this._map[key];
+		this._map[key] = value;
 		if (old !== value)
-			this.dep.changed();
+			this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.has = function(key) {
 		if (Tracker.active)
-			this.dep.depend();
+			this._dep.depend();
 		return this.hasOwnProperty(key);
 	};
 
 	ReactiveObjectMap.prototype.clear = function(key, value) {
-		this.map = {};
-		this.dep.changed();
+		this._map = {};
+		this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.delete = function(key, value) {
-		if (delete this.map[key])
-			this.dep.changed();
+		if (delete this._map[key])
+			this._dep.changed();
 	};
 
 
 	ReactiveObjectMap.prototype.setAttribute = function(key, attr, value) {
-		var old = this.map[key][attr];
-		this.map[key][attr] = value;
+		var old = this._map[key][attr];
+		this._map[key][attr] = value;
 		if (old !== value)
-			this.dep.changed();
+			this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.getAttribute = function(key, attr) {
 		if (Tracker.active)
-			this.dep.depend();
-		return this.map[key][attr];
+			this._dep.depend();
+		return this._map[key][attr];
 	};
 
 	ReactiveObjectMap.prototype.keys = function() {
 		if (Tracker.active)
-			this.dep.depend();
-		return Object.keys(this.map);
+			this._dep.depend();
+		return Object.keys(this._map);
 	};
 
 	ReactiveObjectMap.prototype.values = function() {
 		if (Tracker.active)
-			this.dep.depend();
-		return _.values(this.map);
+			this._dep.depend();
+		return _.values(this._map);
 	};
 
 	ReactiveObjectMap.prototype.filter = function(predicate) {
 		if (Tracker.active)
-			this.dep.depend();
-		return _.filter(this.map,predicate);
+			this._dep.depend();
+		return _.filter(this._map,predicate);
 	};
 
 	ReactiveObjectMap.prototype.sortBy = function(iteratee) {
 		if (Tracker.active)
-			this.dep.depend();
-		return _.sortBy(this.map,iteratee);
+			this._dep.depend();
+		return _.sortBy(this._map,iteratee);
 	};
 
 	ReactiveObjectMap.prototype.map = function(iteratee) {
 		if (Tracker.active)
-			this.dep.depend();
-		return _.map(this.map,iteratee);
+			this._dep.depend();
+		return _._map(this._map,iteratee);
 	};
 
 	ReactiveObjectMap.prototype.size = function() {
 		if (Tracker.active)
-			this.dep.depend();
-		return Object.keys(this.map).length;
+			this._dep.depend();
+		return Object.keys(this._map).length;
 	};
 
 	ReactiveObjectMap.prototype.toString = function() {
@@ -104,7 +104,7 @@ module.exports = function(Meteor) {
 		// Tests want to know.
 		// Accesses a private field of Tracker.Dependency.
 		var count = 0;
-		for (var id in this.dep._dependentsById)
+		for (var id in this._dep._dependentsById)
 			count++;
 		return count;
 	};
