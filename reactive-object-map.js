@@ -1,11 +1,11 @@
 module.exports = function(Meteor) {
 	var _ = Meteor.underscore;
 	var Tracker = Meteor.Tracker;
-	var ReactiveObjectMap;
 
-	ReactiveObjectMap = function() {
-		if (!(this instanceof ReactiveObjectMap))
+
+	function ReactiveObjectMap() {
 		// called without `new`
+		if (!(this instanceof ReactiveObjectMap))
 			return new ReactiveObjectMap();
 
 		this._map = {};
@@ -25,9 +25,11 @@ module.exports = function(Meteor) {
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
 		var old = this._map[key];
-		this._map[key] = value;
 		if (old !== value)
+		{
+			this._map[key] = value;
 			this._dep.changed();
+		}
 	};
 
 	ReactiveObjectMap.prototype.has = function(key) {
@@ -49,51 +51,29 @@ module.exports = function(Meteor) {
 
 	ReactiveObjectMap.prototype.setAttribute = function(key, attr, value) {
 		var old = this._map[key][attr];
-		this._map[key][attr] = value;
 		if (old !== value)
+		{
+			this._map[key][attr] = value;
 			this._dep.changed();
+		}
 	};
 
 	ReactiveObjectMap.prototype.getAttribute = function(key, attr) {
-		if (Tracker.active)
-			this._dep.depend();
-		return this._map[key][attr];
+		return this.get(key)[attr];
 	};
 
-	ReactiveObjectMap.prototype.keys = function() {
-		if (Tracker.active)
-			this._dep.depend();
-		return Object.keys(this._map);
-	};
 
-	ReactiveObjectMap.prototype.values = function() {
-		if (Tracker.active)
-			this._dep.depend();
-		return _.values(this._map);
-	};
-
-	ReactiveObjectMap.prototype.filter = function(predicate) {
-		if (Tracker.active)
-			this._dep.depend();
-		return _.filter(this._map,predicate);
-	};
-
-	ReactiveObjectMap.prototype.sortBy = function(iteratee) {
-		if (Tracker.active)
-			this._dep.depend();
-		return _.sortBy(this._map,iteratee);
-	};
-
-	ReactiveObjectMap.prototype.map = function(iteratee) {
-		if (Tracker.active)
-			this._dep.depend();
-		return _.map(this._map,iteratee);
-	};
+	['keys', 'values', 'filter', 'sortBy', 'map'].forEach(function(methodName)
+	{
+		ReactiveObjectMap.prototype[methodName] = function(value) {
+			if (Tracker.active)
+				this._dep.depend();
+			return _[methodName](this._map, value);
+		};
+	})
 
 	ReactiveObjectMap.prototype.size = function() {
-		if (Tracker.active)
-			this._dep.depend();
-		return Object.keys(this._map).length;
+		return this.keys().length;
 	};
 
 	ReactiveObjectMap.prototype.toString = function() {
@@ -103,13 +83,9 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap.prototype._numListeners = function() {
 		// Tests want to know.
 		// Accesses a private field of Tracker.Dependency.
-		var count = 0;
-		for (var id in this._dep._dependentsById)
-			count++;
-		return count;
+		return Object.keys(this._dep._dependentsById).length
 	};
 
-	Meteor.ReactiveObjectMap = ReactiveObjectMap;
 
-	module.exports = ReactiveObjectMap;
+	module.exports = Meteor.ReactiveObjectMap = ReactiveObjectMap;
 };
