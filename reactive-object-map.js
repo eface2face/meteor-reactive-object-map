@@ -12,16 +12,36 @@ module.exports = function(Meteor) {
 		this._dep = new Tracker.Dependency;
 	};
 
+
+	ReactiveObjectMap.prototype.size = function() {
+		return this.keys().length;
+	};
+
+	ReactiveObjectMap.prototype.toString = function() {
+		return 'ReactiveObjectMap{' + this.get() + '}';
+	};
+
+	ReactiveObjectMap.prototype._numListeners = function() {
+		// Tests want to know.
+		// Accesses a private field of Tracker.Dependency.
+		return Object.keys(this._dep._dependentsById).length
+	};
+
+
+	// Entries (globally)
+
 	ReactiveObjectMap.prototype.assign = function(collection, iteratee) {
 		this._map = _.indexBy(collection, iteratee);
 		this._dep.changed();
 	};
 
-	ReactiveObjectMap.prototype.get = function(key) {
-		if (Tracker.active)
-			this._dep.depend();
-		return this._map[key];
+	ReactiveObjectMap.prototype.clear = function(key, value) {
+		this._map = {};
+		this._dep.changed();
 	};
+
+
+	// Entries
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
 		var old = this._map[key];
@@ -32,15 +52,16 @@ module.exports = function(Meteor) {
 		}
 	};
 
+	ReactiveObjectMap.prototype.get = function(key) {
+		if (Tracker.active)
+			this._dep.depend();
+		return this._map[key];
+	};
+
 	ReactiveObjectMap.prototype.has = function(key) {
 		if (Tracker.active)
 			this._dep.depend();
 		return this.hasOwnProperty(key);
-	};
-
-	ReactiveObjectMap.prototype.clear = function(key, value) {
-		this._map = {};
-		this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.delete = function(key, value) {
@@ -48,6 +69,8 @@ module.exports = function(Meteor) {
 			this._dep.changed();
 	};
 
+
+	// Entries attributes
 
 	ReactiveObjectMap.prototype.setAttribute = function(key, attr, value) {
 		var old = this._map[key][attr];
@@ -63,6 +86,8 @@ module.exports = function(Meteor) {
 	};
 
 
+	// Access functions
+
 	['keys', 'values', 'filter', 'sortBy', 'map'].forEach(function(methodName)
 	{
 		ReactiveObjectMap.prototype[methodName] = function(value) {
@@ -71,20 +96,6 @@ module.exports = function(Meteor) {
 			return _[methodName](this._map, value);
 		};
 	})
-
-	ReactiveObjectMap.prototype.size = function() {
-		return this.keys().length;
-	};
-
-	ReactiveObjectMap.prototype.toString = function() {
-		return 'ReactiveObjectMap{' + this.get() + '}';
-	};
-
-	ReactiveObjectMap.prototype._numListeners = function() {
-		// Tests want to know.
-		// Accesses a private field of Tracker.Dependency.
-		return Object.keys(this._dep._dependentsById).length
-	};
 
 
 	module.exports = Meteor.ReactiveObjectMap = ReactiveObjectMap;
