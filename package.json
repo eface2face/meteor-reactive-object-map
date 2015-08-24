@@ -11,6 +11,9 @@
     "url": "git@github.com:eface2face/meteor-reactive-object-map.git"
   },
   "author": "Sergio Garcia Murillo",
+  "contributors": [
+    "Jesús Leganés Combarro 'piranna' <piranna@gmail.com>"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/eface2face/meteor-reactive-object-map/issues"
