@@ -3,21 +3,74 @@ module.exports = function(Meteor) {
 	var Tracker = Meteor.Tracker;
 
 
-	function observer()
+	function ReactiveObjectMap()
 	{
-		this._dep.changed();
-	}
-
-
-	function ReactiveObjectMap() {
 		// called without `new`
 		if (!(this instanceof ReactiveObjectMap))
 			return new ReactiveObjectMap();
 
-		this._map = {};
-		Object.observe(this._map, observer)
+		var self = this
 
+
+		this._map = {};
 		this._dep = new Tracker.Dependency;
+
+
+		function observer(changes)
+		{
+			console.log(changes)
+			self._dep.changed();
+		}
+
+		function setMap(value)
+		{
+			var map = this._map
+			Object.keys(map).forEach(function(key)
+			{
+				Object.unobserve(map[key], observer)
+			})
+
+			this._map = value
+			this._dep.changed()
+		}
+
+
+		// Entries (globally)
+
+		this.assign = function(collection, iteratee)
+		{
+			setMap(_.indexBy(collection, iteratee))
+
+			collection.forEach(function(item)
+			{
+				Object.observe(item, observer)
+			})
+		};
+
+		this.clear = setMap.bind(this, {})
+
+
+		// Entries
+
+		this.set = function(key, item) {
+			if(this._map[key] !== item)
+			{
+				this._map[key] = item
+
+				Object.observe(item, observer)
+
+				this._dep.changed()
+			}
+		};
+
+		this.delete = function(key)
+		{
+			Object.unobserve(this._map[key], observer)
+
+			delete this._map[key]
+
+			this._dep.changed()
+		};
 	};
 
 
@@ -36,49 +89,7 @@ module.exports = function(Meteor) {
 	};
 
 
-	// Entries (globally)
-
-	function setMap(value)
-	{
-		var map = this._map
-		Object.keys(map).forEach(function(key)
-		{
-			Object.unobserve(map[key], observer)
-		}, this)
-		Object.unobserve(map, observer)
-
-		this._map = value
-		Object.observe(value, observer)
-
-		this._dep.changed()
-	}
-
-	ReactiveObjectMap.prototype.assign = function(collection, iteratee)
-	{
-		setMap(_.indexBy(collection, iteratee))
-
-		collection.forEach(function(item)
-		{
-			Object.observe(item, observer);
-		})
-	};
-
-	ReactiveObjectMap.prototype.clear = function()
-	{
-		setMap({})
-	};
-
-
 	// Entries
-
-	ReactiveObjectMap.prototype.set = function(key, item) {
-		if(this._map[key] !== item)
-		{
-			this._map[key] = item
-
-			Object.observe(item, observer)
-		}
-	};
 
 	ReactiveObjectMap.prototype.get = function(key) {
 		if (Tracker.active) this._dep.depend();
@@ -90,13 +101,6 @@ module.exports = function(Meteor) {
 		if (Tracker.active) this._dep.depend();
 
 		return this.hasOwnProperty(key);
-	};
-
-	ReactiveObjectMap.prototype.delete = function(key)
-	{
-		Object.unobserve(this._map[key], observer);
-
-		delete this._map[key]
 	};
 
 
