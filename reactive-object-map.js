@@ -24,11 +24,15 @@ module.exports = function(Meteor) {
 
 		function setMap(value)
 		{
-			var map = this._map
-			Object.keys(map).forEach(function(key)
+			if(Object.unobserve)
 			{
-				Object.unobserve(map[key], observer)
-			})
+				var map = this._map
+
+				Object.keys(map).forEach(function(key)
+				{
+					Object.unobserve(map[key], observer)
+				})
+			}
 
 			this._map = value
 			this._dep.changed()
@@ -41,10 +45,11 @@ module.exports = function(Meteor) {
 		{
 			setMap(_.indexBy(collection, iteratee))
 
-			collection.forEach(function(item)
-			{
-				Object.observe(item, observer)
-			})
+			if(Object.observe)
+				collection.forEach(function(item)
+				{
+					Object.observe(item, observer)
+				})
 		};
 
 		this.clear = setMap.bind(this, {})
@@ -57,7 +62,8 @@ module.exports = function(Meteor) {
 			{
 				this._map[key] = item
 
-				Object.observe(item, observer)
+				if(Object.observe)
+					 Object.observe(item, observer)
 
 				this._dep.changed()
 			}
@@ -65,7 +71,8 @@ module.exports = function(Meteor) {
 
 		this.delete = function(key)
 		{
-			Object.unobserve(this._map[key], observer)
+			if(Object.unobserve)
+				 Object.unobserve(this._map[key], observer)
 
 			delete this._map[key]
 
