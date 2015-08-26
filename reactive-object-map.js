@@ -9,18 +9,10 @@ module.exports = function(Meteor) {
 		if (!(this instanceof ReactiveObjectMap))
 			return new ReactiveObjectMap();
 
-		var self = this
-
-
 		this._map = {};
 		this._dep = new Tracker.Dependency;
 
-
-		function observer(changes)
-		{
-			console.log(changes)
-			self._dep.changed();
-		}
+		var observer = this._dep.changed.bind(this._dep)
 
 		function setMap(value)
 		{
