@@ -33,7 +33,7 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap.prototype.has = function(key) {
 		if (Tracker.active)
 			this._dep.depend();
-		return this.hasOwnProperty(key);
+		return this._map.hasOwnProperty(key);
 	};
 
 	ReactiveObjectMap.prototype.clear = function(key, value) {
