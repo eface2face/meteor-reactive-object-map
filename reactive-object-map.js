@@ -20,7 +20,10 @@ module.exports = function(Meteor) {
 	ReactiveObjectMap.prototype.get = function(key) {
 		if (Tracker.active)
 			this._dep.depend();
-		return this._map[key];
+		if (key)
+			return this._map[key];
+		else
+			return this._map;
 	};
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
