@@ -3,12 +3,12 @@ module.exports = function(Meteor) {
 	var Tracker = Meteor.Tracker;
 	var ReactiveObjectMap;
 
-	ReactiveObjectMap = function() {
+	ReactiveObjectMap = function(obj) {
 		if (!(this instanceof ReactiveObjectMap))
 		// called without `new`
 			return new ReactiveObjectMap();
 
-		this._map = {};
+		this._map = Object.assign({}, obj);
 		this._dep = new Tracker.Dependency;
 	};
 
