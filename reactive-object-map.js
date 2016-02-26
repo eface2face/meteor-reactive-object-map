@@ -27,8 +27,10 @@ module.exports = function(Meteor) {
 	};
 
 	ReactiveObjectMap.prototype.set = function(key, value) {
+		var old = this._map[key];
 		this._map[key] = value;
-		this._dep.changed();
+		if (old !== value)
+			this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.has = function(key) {
@@ -49,56 +51,51 @@ module.exports = function(Meteor) {
 
 
 	ReactiveObjectMap.prototype.setAttribute = function(key, attr, value) {
+		var old = this._map[key][attr];
 		this._map[key][attr] = value;
-		this._dep.changed();
+		if (old !== value)
+			this._dep.changed();
 	};
 
 	ReactiveObjectMap.prototype.getAttribute = function(key, attr) {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return this._map[key][attr];
 	};
 
 	ReactiveObjectMap.prototype.keys = function() {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return Object.keys(this._map);
 	};
 
 	ReactiveObjectMap.prototype.values = function() {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return _.values(this._map);
 	};
 
 	ReactiveObjectMap.prototype.filter = function(predicate) {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return _.filter(this._map,predicate);
 	};
 
 	ReactiveObjectMap.prototype.sortBy = function(iteratee) {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return _.sortBy(this._map,iteratee);
 	};
 
 	ReactiveObjectMap.prototype.map = function(iteratee) {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return _.map(this._map,iteratee);
 	};
 
 	ReactiveObjectMap.prototype.size = function() {
 		if (Tracker.active)
 			this._dep.depend();
-
 		return Object.keys(this._map).length;
 	};
 
@@ -110,10 +107,8 @@ module.exports = function(Meteor) {
 		// Tests want to know.
 		// Accesses a private field of Tracker.Dependency.
 		var count = 0;
-
 		for (var id in this._dep._dependentsById)
 			count++;
-
 		return count;
 	};
 
