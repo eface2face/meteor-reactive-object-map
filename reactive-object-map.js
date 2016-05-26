@@ -5,7 +5,7 @@ module.exports = function(Meteor) {
 
 	ReactiveObjectMap = function(obj) {
 		if (!(this instanceof ReactiveObjectMap))
-		// called without `new`
+			// called without `new`
 			return new ReactiveObjectMap();
 
 		this._map = _.assign({}, obj);
