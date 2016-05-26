@@ -8,7 +8,7 @@ module.exports = function(Meteor) {
 		// called without `new`
 			return new ReactiveObjectMap();
 
-		this._map = Object.assign({}, obj);
+		this._map = _.assign({}, obj);
 		this._dep = new Tracker.Dependency;
 	};
 
